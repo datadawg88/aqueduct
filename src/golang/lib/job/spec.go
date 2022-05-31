@@ -15,6 +15,7 @@ import (
 	"github.com/aqueducthq/aqueduct/lib/workflow/operator/connector/auth"
 	"github.com/aqueducthq/aqueduct/lib/workflow/operator/connector/github"
 	"github.com/dropbox/godropbox/errors"
+	"github.com/google/uuid"
 )
 
 var (
@@ -44,6 +45,7 @@ const (
 	LoadJobType           JobType = "load"
 	DiscoverJobType       JobType = "discover"
 	WorkflowRetentionType JobType = "workflow_retention"
+	CompileAirflowJobType JobType = "compile_airflow"
 )
 
 // `ExecutorConfiguration` represents the configuration variables that are
@@ -140,6 +142,15 @@ type DiscoverSpec struct {
 	OutputContentPath string              `json:"output_content_path"  yaml:"output_content_path"`
 }
 
+type CompileAirflowSpec struct {
+	basePythonSpec
+	OutputContentPath string
+	WorkflowId        uuid.UUID
+	WorkflowName      string
+	OpIdToJobSpec     map[string]uuid.UUID
+	Edges             map[uuid.UUID]uuid.UUID
+}
+
 func (*WorkflowRetentionSpec) Type() JobType {
 	return WorkflowRetentionType
 }
@@ -170,6 +181,10 @@ func (*LoadSpec) Type() JobType {
 
 func (*DiscoverSpec) Type() JobType {
 	return DiscoverJobType
+}
+
+func (*CompileAirflowSpec) Type() JobType {
+	return CompileAirflowJobType
 }
 
 // NewWorkflowRetentionSpec constructs a Spec for a WorkflowRetentionJob.
@@ -378,6 +393,11 @@ func NewDiscoverSpec(
 		ConnectorConfig:   connectorConfig,
 		OutputContentPath: outputContentPath,
 	}
+}
+
+// NewCompileAirflowSpec constructs a Spec for a CompileAirflowJob.
+func NewCompileAirflowSpec() Spec {
+	return nil
 }
 
 // `EncodeSpec` first serialize `spec` according to `SerializationType` and returns the base64 encoded string.
