@@ -20,6 +20,7 @@ class JobType(str, Enum, metaclass=MetaEnum):
     LOAD = "load"
     DISCOVER = "discover"
     PARAM = "param"
+    COMPILE_AIRFLOW = "compile_airflow"
 
 
 class InputArtifactType(str, Enum, metaclass=MetaEnum):
