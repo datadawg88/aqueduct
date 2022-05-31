@@ -147,7 +147,7 @@ type CompileAirflowSpec struct {
 	OutputContentPath string
 	WorkflowId        uuid.UUID
 	WorkflowName      string
-	OpIdToJobSpec     map[string]uuid.UUID
+	Specs             map[uuid.UUID]Spec
 	Edges             map[uuid.UUID]uuid.UUID
 }
 

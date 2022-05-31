@@ -21,4 +21,5 @@ class CompileAirflowSpec(BaseModel):
     output_content_path: str
     workflow_id: uuid.UUID
     workflow_name: str
+    specs: Dict[uuid.UUID, OperatorSpec]
     edges: Dict[uuid.UUID, uuid.UUID]
