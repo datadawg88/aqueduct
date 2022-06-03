@@ -3,9 +3,8 @@ from typing import List
 
 import pandas as pd
 import pandas_gbq
-from google.oauth2 import service_account
-
 from aqueduct_executor.operators.connectors.tabular import config, connector, extract, load
+from google.oauth2 import service_account
 
 
 class BigQueryConnector(connector.TabularConnector):
