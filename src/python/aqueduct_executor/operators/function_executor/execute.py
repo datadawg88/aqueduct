@@ -5,13 +5,12 @@ import os
 import sys
 import traceback
 from contextlib import redirect_stderr, redirect_stdout
-from typing import Any, Callable, List, Tuple, Dict
+from typing import Any, Callable, Dict, List, Tuple
 
 from aqueduct_executor.operators.function_executor import spec
 from aqueduct_executor.operators.function_executor.utils import OP_DIR
 from aqueduct_executor.operators.utils import utils
 from aqueduct_executor.operators.utils.storage.parse import parse_storage
-
 from pandas import DataFrame
 
 
@@ -137,6 +136,7 @@ def _execute_function(
 
     return result, _fetch_logs(stdout_log, stderr_log), ""
 
+
 def run(spec: spec.FunctionSpec) -> None:
     """
     Executes a function operator.
@@ -145,7 +145,7 @@ def run(spec: spec.FunctionSpec) -> None:
 
     storage = parse_storage(spec.storage_config)
     logs = {}
-    
+
     try:
         # Read the input data from intermediate storage.
         inputs = utils.read_artifacts(
