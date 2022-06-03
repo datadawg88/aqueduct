@@ -1,5 +1,3 @@
-import argparse
-import base64
 import importlib
 import io
 import json
@@ -12,7 +10,6 @@ from typing import Any, Callable, List, Tuple, Dict
 from aqueduct_executor.operators.function_executor import spec
 from aqueduct_executor.operators.function_executor.utils import OP_DIR
 from aqueduct_executor.operators.utils import utils
-from aqueduct_executor.operators.utils.storage.storage import Storage
 from aqueduct_executor.operators.utils.storage.parse import parse_storage
 
 from pandas import DataFrame
@@ -140,34 +137,15 @@ def _execute_function(
 
     return result, _fetch_logs(stdout_log, stderr_log), ""
 
-
-def _write_outputs(
-    spec: spec.FunctionSpec,
-    storage: Storage,
-    res: Any,
-    logs: Dict[str, str],
-):
-    # Force all results to be of type `list`, so we can always loop over them.
-    results = res
-    if not isinstance(res, list):
-        results = [res]
-
-    utils.write_artifacts(
-        storage,
-        spec.output_content_paths,
-        spec.output_metadata_paths,
-        results,
-        spec.output_artifact_types,
-    )
-    utils.write_operator_metadata(storage, spec.metadata_path, "", logs)
-
-
 def run(spec: spec.FunctionSpec) -> None:
     """
     Executes a function operator.
     """
+    print("Started %s job: %s" % (spec.type, spec.name))
+
     storage = parse_storage(spec.storage_config)
     logs = {}
+    
     try:
         # Read the input data from intermediate storage.
         inputs = utils.read_artifacts(
@@ -199,16 +177,3 @@ def run(spec: spec.FunctionSpec) -> None:
         print("Exception Raised: ", e)
         traceback.print_tb(e.__traceback__)
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--spec", required=True)
-    args = parser.parse_args()
-
-    spec_json = base64.b64decode(args.spec)
-    spec = spec.parse_spec(spec_json)
-
-    print("Started %s job: %s" % (spec.type, spec.name))
-
-    run(spec)
