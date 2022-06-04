@@ -26,7 +26,6 @@ def test_basic_flow(sp_client):
     output_artifact.save(
         config=db.config(table=generate_table_name(), update_mode=LoadUpdateMode.REPLACE)
     )
-
     run_flow_test(sp_client, artifacts=[output_artifact])
 
 
@@ -94,6 +93,7 @@ def test_publish_with_schedule(sp_client):
         sp_client,
         artifacts=[output_artifact],
         schedule=aqueduct.hourly(minute=aqueduct.Minute(execute_at.minute)),
+        num_runs=2, # Wait for two runs because registering a workflow always triggers an immediate run first.
     )
 
 

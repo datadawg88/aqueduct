@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/aqueducthq/aqueduct/internal/server/utils"
 	"github.com/aqueducthq/aqueduct/lib/collections/workflow"
@@ -108,5 +109,13 @@ func (h *RefreshWorkflowHandler) Perform(ctx context.Context, interfaceArgs inte
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "Unable to trigger this workflow.")
 	}
+
+	// TODO: debate this in the PR
+	status, err := job.PollJob(ctx, jobName, h.JobManager, 2*time.Second, 5*time.Minute)
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(err, "Unable to poll this workflow.")
+	}
+	fmt.Printf("Cron job completed with status %s\n", status)
+
 	return struct{}{}, http.StatusOK, nil
 }

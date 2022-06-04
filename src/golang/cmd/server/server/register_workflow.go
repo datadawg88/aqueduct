@@ -216,7 +216,6 @@ func (h *RegisterWorkflowHandler) Perform(ctx context.Context, interfaceArgs int
 	if err := txn.Commit(ctx); err != nil {
 		return emptyResp, http.StatusInternalServerError, errors.Wrap(err, "Unable to create workflow.")
 	}
-
 	_, _, err = (&RefreshWorkflowHandler{
 		Database:       h.Database,
 		JobManager:     h.JobManager,
