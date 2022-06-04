@@ -26,6 +26,7 @@ def test_basic_flow(sp_client):
     output_artifact.save(
         config=db.config(table=generate_table_name(), update_mode=LoadUpdateMode.REPLACE)
     )
+
     run_flow_test(sp_client, artifacts=[output_artifact])
 
 
