@@ -273,7 +273,9 @@ func createWorkflowCronJob(
 		workflowId,
 		dbConfig,
 		vaultObject.Config(),
-		jobManager.Config(),
+		jobManager.Config(
+			true, /* logToFile */
+		),
 		githubManager.Config(),
 	)
 

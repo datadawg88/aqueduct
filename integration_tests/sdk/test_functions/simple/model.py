@@ -4,6 +4,7 @@ from aqueduct import op
 @op()
 def dummy_sentiment_model(df):
     df["positivity"] = 123
+    5/0
     return df
 
 

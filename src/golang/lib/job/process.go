@@ -33,6 +33,7 @@ const (
 
 var (
 	defaultBinaryDir          = path.Join(os.Getenv("HOME"), ".aqueduct", BinaryDir)
+	defaultLogsDir            = path.Join(os.Getenv("HOME"), ".aqueduct", LogsDir)
 	defaultOperatorStorageDir = path.Join(os.Getenv("HOME"), ".aqueduct", OperatorStorageDir)
 )
 
@@ -56,6 +57,11 @@ type ProcessJobManager struct {
 	cronScheduler *gocron.Scheduler
 	// A mapping from cron job name to cron job object pointer.
 	cronMapping map[string]*cronMetadata
+
+	// If empty , we will only log job outputs to the console. Console logs are only flushed to
+	// the console on Poll(). So if you call Launch() without a Poll(), they will never be seen.
+	// If this is not empty, we will pipe all job outputs into files inside this directory.
+	logsDir string
 }
 
 func NewProcessJobManager(conf *ProcessConfig) (*ProcessJobManager, error) {
@@ -79,6 +85,7 @@ func NewProcessJobManager(conf *ProcessConfig) (*ProcessJobManager, error) {
 		cmds:          map[string]*Command{},
 		cronScheduler: cronScheduler,
 		cronMapping:   map[string]*cronMetadata{},
+		logsDir:       conf.LogsDir,
 	}, nil
 }
 
@@ -154,22 +161,17 @@ func (j *ProcessJobManager) generateCronFunction(name string, jobSpec Spec) func
 		} else {
 			log.Infof("Launched cron job %s", jobName)
 		}
-
-		// This is purely for printing out the result of execution and logs.
-		for {
-			_, err := PollJob(context.Background(), jobName, j, 2*time.Second, 10*time.Minute)
-			if err != nil && errors.IsError(err, ErrPollJobTimeout) {
-				log.Infof("Cron job poll timeout hit, continue waiting on %s.", name)
-				continue
-			}
-			break
-		}
-		log.Infof("Cron job %s completed.", jobName)
 	}
 }
 
-func (j *ProcessJobManager) Config() Config {
-	return j.conf
+func (j *ProcessJobManager) Config(logToFile bool) Config {
+	newConfig := *j.conf
+	if logToFile {
+		newConfig.LogsDir = defaultLogsDir
+	} else {
+		newConfig.LogsDir = ""
+	}
+	return &newConfig
 }
 
 func (j *ProcessJobManager) Launch(
@@ -177,7 +179,7 @@ func (j *ProcessJobManager) Launch(
 	name string,
 	spec Spec,
 ) error {
-	log.Infof("Running job %s.", name)
+	log.Infof("Running %s job %s.", spec.Type(), name)
 	if _, ok := j.cmds[name]; ok {
 		return ErrJobAlreadyExists
 	}

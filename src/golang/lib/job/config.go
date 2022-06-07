@@ -1,11 +1,14 @@
 package job
 
-import "encoding/gob"
+import (
+	"encoding/gob"
+)
 
 type ManagerType string
 
 const (
 	ProcessType ManagerType = "process"
+	LogsDir                 = "logs/"
 )
 
 type Config interface {
@@ -14,6 +17,7 @@ type Config interface {
 
 type ProcessConfig struct {
 	BinaryDir             string `yaml:"binaryDir" json:"binary_dir"`
+	LogsDir               string `yaml:"logsDir" json:"logs_dir"`
 	PythonExecutorPackage string `yaml:"pythonExecutorPackage" json:"python_executor_package"`
 	OperatorStorageDir    string `yaml:"operatorStorageDir" json:"operator_storage_dir"`
 }

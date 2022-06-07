@@ -16,7 +16,7 @@ var (
 )
 
 type JobManager interface {
-	Config() Config
+	Config(logToFile bool) Config
 	Launch(ctx context.Context, name string, spec Spec) error
 	Poll(ctx context.Context, name string) (shared.ExecutionStatus, error)
 	DeployCronJob(ctx context.Context, name string, period string, spec Spec) error

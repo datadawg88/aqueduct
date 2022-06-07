@@ -152,7 +152,7 @@ func (h *EditWorkflowHandler) updateWorkflowSchedule(
 				workflowId,
 				h.Database.Config(),
 				h.Vault.Config(),
-				h.JobManager.Config(),
+				h.JobManager.Config(true /* logToFile */),
 				h.GithubManager.Config(),
 			)
 			err := h.JobManager.DeployCronJob(
